@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+<title>demo</title>
+<style>
+
+</style>
+<script>
+;(function() {
+  window.onload = function() {
+
+    var socket =new WebSocket("ws://localhost:8080/websocket");
+    socket.onerror = console.log.bind(console, "error!:");
+
+    var container = document.getElementById('list');
+
+    var messageCount = 0;
+    
+    socket.onopen= function(){
+        console.log("open")
+
+        socket.onmessage = function(messageEvent){
+            var blob =  messageEvent.data
+            var reader = new FileReader();
+            reader.onload = function(){
+                if(container.children.length >= 15){
+                  container.removeChild(container.children[0]);
+                }
+                var li = document.createElement('li');
+                li.innerText = messageCount + " : " + this.result;
+                container.appendChild(li);
+                messageCount++;
+            }
+            reader.readAsBinaryString(blob) // encoding!
+        }
+        socket.onclose = function() {
+            console.log.bind(console, "close")
+        };
+    }
+
+
+  };
+}).call(this);
+</script>
+</head>
+<body>
+  <ul id="list">
+  </ul>
+</body>
+</html>
